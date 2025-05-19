@@ -45,14 +45,25 @@ class _SignInPageState extends State<SignInPage> {
                     _gap(height: 60),
                     _buildSignInButton(context),
                     _gap(),
-                    CustomTextButton(onPressed: () {}, 
-                    buttonText: "Şifremi Unuttum",
-                    textColor: const Color.fromARGB(255, 255, 255, 255)),
-                    _gap(),
-                    CustomTextButton(onPressed: () => Navigator.pushNamed(context, "/sign-up"),
-                    buttonText: "Henüz Hesabım Yok",
-                    textColor: const Color.fromARGB(255, 255, 255, 255)),
-                    _gap(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomTextButton(
+                          onPressed: () {}, 
+                          buttonText: "Şifremi Unuttum",
+                          textColor: const Color.fromARGB(255, 255, 255, 255)
+                        ),
+                        const Text(
+                          " / ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        CustomTextButton(
+                          onPressed: () => Navigator.pushNamed(context, "/sign-up"),
+                          buttonText: "Henüz Hesabım Yok",
+                          textColor: const Color.fromARGB(255, 255, 255, 255)
+                        ),
+                      ],
+                    ),
                     CustomTextButton(onPressed:() async {
                       final result = await _authService.signInAnonymous();
 
@@ -91,7 +102,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _buildTitle() {
     return const Text(
-      "Merhaba \nKullanıcı Adı",
+      "Merhaba, \nHadi Giriş Yapalım",
       style: TextStyle(
         fontSize: 30,
         fontWeight: FontWeight.bold,

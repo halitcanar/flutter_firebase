@@ -73,7 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildTitle() {
     return const Text(
-      "Hadi Gel \nKayıt Olalım",
+      "Merhaba, \nHadi Kayıt Olalım",
       style: TextStyle(
         fontSize: 30,
         fontWeight: FontWeight.bold,
