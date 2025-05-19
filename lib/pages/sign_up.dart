@@ -52,7 +52,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         Navigator.of(context).push(
                           SlidePageRoute(
                             page: const SignInPage(), // Use the actual widget instead of a string
-                            direction: AxisDirection.left, // Soldan sağa doğru kayma
+                            direction: AxisDirection.right, // Soldan sağa doğru kayma
                           ),
                         );
                       }, 
