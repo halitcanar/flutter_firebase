@@ -4,7 +4,7 @@ import 'package:learn_flutter_firebase/widgets/custom_text_button.dart';
 import '../services/auth_service.dart';
 import 'package:learn_flutter_firebase/utils/page_transitions.dart';
 import 'package:learn_flutter_firebase/pages/sign_up.dart'; // Import the SignInPage
-
+import 'package:learn_flutter_firebase/pages/home_page.dart'; // Import the HomePage
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -80,7 +80,12 @@ class _SignInPageState extends State<SignInPage> {
 
                       if (result is User) {
                         print(result.uid);
-                        Navigator.pushNamed(context, "/home");
+                        Navigator.of(context).push(
+                          SlidePageRoute(
+                            page: const HomePage(), // Use the actual widget instead of a string
+                            direction: AxisDirection.up, // Soldan sağa doğru kayma
+                          ),
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Giriş başarısız: ${result.toString()}')),
