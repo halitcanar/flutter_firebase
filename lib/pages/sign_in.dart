@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_flutter_firebase/widgets/custom_text_button.dart';
 import '../services/auth_service.dart';
+import 'package:learn_flutter_firebase/utils/page_transitions.dart';
+import 'package:learn_flutter_firebase/pages/sign_up.dart'; // Import the SignInPage
+
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -58,12 +61,20 @@ class _SignInPageState extends State<SignInPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         CustomTextButton(
-                          onPressed: () => Navigator.pushNamed(context, "/sign-up"),
-                          buttonText: "Henüz Hesabım Yok",
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              SlidePageRoute(
+                                page: const SignUpPage(), // Use the actual widget instead of a string
+                                direction: AxisDirection.left, // Soldan sağa doğru kayma
+                              ),
+                            );
+                      }, 
+                          buttonText: "Hesap Oluştur",
                           textColor: const Color.fromARGB(255, 255, 255, 255)
                         ),
                       ],
                     ),
+                    _gap(),
                     CustomTextButton(onPressed:() async {
                       final result = await _authService.signInAnonymous();
 

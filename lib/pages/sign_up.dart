@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_flutter_firebase/widgets/custom_text_button.dart';
+import 'package:learn_flutter_firebase/utils/page_transitions.dart';
+import 'package:learn_flutter_firebase/pages/sign_in.dart'; // Import the SignInPage
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -42,13 +44,21 @@ class _SignUpPageState extends State<SignUpPage> {
                     _buildEmailField(),
                     _gap(),
                     _buildPasswordField(),
-                    _gap(height: 120),
+                    _gap(height: 60),
                     _buildSignUpButton(context),
                     _gap(),
                     CustomTextButton(
-                      onPressed: () => Navigator.pushNamed(context, "/sign-in"), 
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          SlidePageRoute(
+                            page: const SignInPage(), // Use the actual widget instead of a string
+                            direction: AxisDirection.left, // Soldan sağa doğru kayma
+                          ),
+                        );
+                      }, 
                       buttonText: "Zaten Hesabım Var",
-                      textColor: const Color.fromARGB(255, 255, 255, 255),),
+                      textColor: const Color.fromARGB(255, 255, 255, 255),
+                    ),
                   ],
                 ),
               ),
