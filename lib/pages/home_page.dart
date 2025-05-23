@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:learn_flutter_firebase/widgets/custom_text_button.dart';
+import '../services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,9 +20,12 @@ class _HomePageState extends State<HomePage> {
   
   // Get user display name or email
   String get _userDisplayText => 
+  
     FirebaseAuth.instance.currentUser?.displayName ?? 
     FirebaseAuth.instance.currentUser?.email ?? 
     'Misafir';
+
+  final _authService = AuthService();
   
   @override
   Widget build(BuildContext context) {
@@ -125,7 +129,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _handleLogout() async {
-    await FirebaseAuth.instance.signOut();
+    _authService.signOut();
     if (context.mounted) {
       Navigator.of(context).pushReplacementNamed('/sign-in');
     }

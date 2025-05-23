@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:learn_flutter_firebase/widgets/custom_text_button.dart';
 import '../services/auth_service.dart';
 import 'package:learn_flutter_firebase/utils/page_transitions.dart';
-import 'package:learn_flutter_firebase/pages/sign_up.dart'; // Import the SignInPage
-import 'package:learn_flutter_firebase/pages/home_page.dart'; // Import the HomePage
+import 'package:learn_flutter_firebase/pages/sign_up.dart';
+import 'package:learn_flutter_firebase/pages/home_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -16,7 +16,6 @@ class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
-  final _firebaseAuth = FirebaseAuth.instance;
   final _authService = AuthService();
 
   @override
@@ -46,54 +45,11 @@ class _SignInPageState extends State<SignInPage> {
                     _gap(),
                     _buildPasswordField(),
                     _gap(height: 60),
-                    _buildSignInButton(context),
+                    _buildSignInButton(),
                     _gap(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomTextButton(
-                          onPressed: () {}, 
-                          buttonText: "Şifremi Unuttum",
-                          textColor: const Color.fromARGB(255, 255, 255, 255)
-                        ),
-                        const Text(
-                          " / ",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        CustomTextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              SlidePageRoute(
-                                page: const SignUpPage(), // Use the actual widget instead of a string
-                                direction: AxisDirection.left, // Soldan sağa doğru kayma
-                              ),
-                            );
-                      }, 
-                          buttonText: "Hesap Oluştur",
-                          textColor: const Color.fromARGB(255, 255, 255, 255)
-                        ),
-                      ],
-                    ),
+                    _buildAccountOptions(),
                     _gap(),
-                    CustomTextButton(onPressed:() async {
-                      final result = await _authService.signInAnonymous();
-
-                      if (result is User) {
-                        print(result.uid);
-                        Navigator.of(context).push(
-                          SlidePageRoute(
-                            page: const HomePage(), // Use the actual widget instead of a string
-                            direction: AxisDirection.up, // Soldan sağa doğru kayma
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Giriş başarısız: ${result.toString()}')),
-                        );
-                      }
-                    }, 
-                    buttonText: "Misafir Girişi", 
-                    textColor: const Color.fromARGB(255, 255, 255, 255)),
+                    _buildGuestLoginButton(),
                   ],
                 ),
               ),
@@ -130,42 +86,47 @@ class _SignInPageState extends State<SignInPage> {
   Widget _buildEmailField() {
     return TextFormField(
       style: const TextStyle(color: Colors.white),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Lütfen bir e-mail girin';
-        }
-        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
-          return 'Geçersiz e-mail formatı';
-        }
-        return null;
-      },
+      validator: _validateEmail,
       onSaved: (value) => _email = value!.trim(),
       decoration: _inputDecoration("E-Posta"),
     );
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Lütfen bir e-mail girin';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(value)) {
+      return 'Geçersiz e-mail formatı';
+    }
+    return null;
+  }
+
   Widget _buildPasswordField() {
     return TextFormField(
       style: const TextStyle(color: Colors.white),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Lütfen bir şifre girin';
-        }
-        if (value.length < 6) {
-          return 'Şifre en az 6 karakter olmalıdır';
-        }
-        return null;
-      },
+      validator: _validatePassword,
       onSaved: (value) => _password = value!,
       obscureText: true,
       decoration: _inputDecoration("Şifre"),
     );
   }
 
-  Widget _buildSignInButton(BuildContext context) {
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Lütfen bir şifre girin';
+    }
+    if (value.length < 6) {
+      return 'Şifre en az 6 karakter olmalıdır';
+    }
+    return null;
+  }
+
+  Widget _buildSignInButton() {
     return Center(
       child: TextButton(
-        onPressed: signIn,
+        onPressed: _signIn,
         child: Container(
           height: 50,
           margin: const EdgeInsets.symmetric(horizontal: 90),
@@ -188,49 +149,102 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+  Widget _buildAccountOptions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CustomTextButton(
+          onPressed: () {}, 
+          buttonText: "Şifremi Unuttum",
+          textColor: Colors.white
+        ),
+        const Text(" / ", style: TextStyle(color: Colors.white)),
+        CustomTextButton(
+          onPressed: _navigateToSignUp,
+          buttonText: "Hesap Oluştur",
+          textColor: Colors.white
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGuestLoginButton() {
+    return CustomTextButton(
+      onPressed: _signInAsGuest, 
+      buttonText: "Misafir Girişi", 
+      textColor: Colors.white
+    );
+  }
+
+  void _navigateToSignUp() {
+    Navigator.of(context).push(
+      SlidePageRoute(
+        page: const SignUpPage(),
+        direction: AxisDirection.left,
+      ),
+    );
+  }
+
+  Future<void> _signInAsGuest() async {
+    final result = await _authService.signInAnonymous();
+
+    if (result is User) {
+      Navigator.of(context).push(
+        SlidePageRoute(
+          page: const HomePage(),
+          direction: AxisDirection.up,
+        ),
+      );
+    } else {
+      _showErrorMessage('Giriş başarısız: ${result.toString()}');
+    }
+  }
+
   Widget _gap({double height = 20}) => SizedBox(height: height);
 
   InputDecoration _inputDecoration(String hintText) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(
-        color: Colors.grey,
-        fontSize: 15,
-      ),
+      hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
       enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(
-          color: Colors.grey,
-        ),
+        borderSide: BorderSide(color: Colors.grey),
       ),
       focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(
-          color: Colors.grey,
-        ),
+        borderSide: BorderSide(color: Colors.grey),
       ),
     );
   }
 
-  Future<void> signIn() async {
+  Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Firebase Authentication ile giriş işlemi
-      try {
-        var userResult = await _firebaseAuth.signInWithEmailAndPassword(
-          email: _email,
-          password: _password,
+      final result = await _authService.signInWithEmailAndPassword(
+        _email,
+        _password,
+      );
+      if (result == "success") {
+        _showSuccessMessage("Giriş Başarılı");
+        Navigator.of(context).push(
+          SlidePageRoute(
+            page: const HomePage(),
+            direction: AxisDirection.up,
+          ),
         );
-        print(userResult.user!.email);
-        _formKey.currentState!.reset();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Center(child: Text('Giriş başarılı'))),
-        );
-        await Future.delayed(const Duration(seconds: 2));
-        Navigator.pushNamed(context, "/home");
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Giriş başarısız: ${e.toString()}')),
-        );
+      } else {
+        _showErrorMessage(result);
       }
     }
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Center(child: Text(message))),
+    );
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }

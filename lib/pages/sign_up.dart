@@ -15,7 +15,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
-  final _firebaseAuth = FirebaseAuth.instance;
+  final _authService = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +176,7 @@ class _SignUpPageState extends State<SignUpPage> {
       _formKey.currentState!.save();
       // Firebase Authentication ile kayıt işlemi
       try {
-        var userResult = await _firebaseAuth.createUserWithEmailAndPassword(
+        final userResult = await _authService.createUserWithEmailAndPassword(
           email: _email,
           password: _password,
         );
@@ -185,8 +185,8 @@ class _SignUpPageState extends State<SignUpPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Center(child: Text('Kayıt başarılı'))),
         );
-        await Future.delayed(const Duration(seconds: 2));
-        Navigator.pushNamed(context, "/home");
+        await Future.delayed(const Duration(seconds: 1));
+        Navigator.pushNamed(context, "/sign-in");
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Kayıt başarısız: ${e.toString()}')),
